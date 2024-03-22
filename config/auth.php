@@ -16,6 +16,7 @@ return [
     'defaults' => [
         'guard' => 'web',
         'passwords' => 'users',
+        // 'passwords' => 'users',
     ],
 
     /*
@@ -36,11 +37,24 @@ return [
     */
 
     'guards' => [
+
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // 'webcompte' => [
+        //     'driver' => 'session',
+        //     'provider' => 'comptes',
+        // ],
     ],
+
+    // 'guards' => [
+    //     'web' => [
+    //         'driver' => 'session',
+    //         'provider' => 'comptes',
+    //     ],
+    // ],
 
     /*
     |--------------------------------------------------------------------------
@@ -60,11 +74,21 @@ return [
     */
 
     'providers' => [
+
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
 
+        // 'comptes' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\Compte::class,
+        // ],
+
+        // 'users' => [
+        //     'driver' => 'database',
+        //     'table' => 'comptes',
+        // ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
@@ -91,6 +115,12 @@ return [
     */
 
     'passwords' => [
+        // 'comptes' => [
+        //     'provider' => 'comptes',
+        //     'table' => 'password_reset_tokens',
+        //     'expire' => 60,
+        //     'throttle' => 60,
+        // ],
         'users' => [
             'provider' => 'users',
             'table' => 'password_reset_tokens',

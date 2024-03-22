@@ -29,6 +29,6 @@ class Personnel extends Model
 
     public function compte()
     {
-        return $this->hasOne(Compte::class);
+        return $this->hasOne(User::class);
     }
 }
