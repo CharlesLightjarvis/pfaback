@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompteController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\RaisonVisiteController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\StatutController;
 use App\Http\Controllers\TypeVisiteController;
 use App\Http\Controllers\TypeVisiteurController;
@@ -38,8 +40,16 @@ Route::resource('statuts', StatutController::class);
 Route::resource('typevisites', TypeVisiteController::class);
 Route::resource('personnels', PersonnelController::class);
 // Route::resource('comptes', CompteController::class);
-Route::resource('comptes', UserController::class);
 Route::resource('visites', VisiteController::class);
+Route::resource('comptes', UserController::class);
+
+Route::get('/dashboard/statistiques', [DashboardController::class, 'getStatistiques']);
+Route::post('/verifier-email', [UserController::class, 'verifierEmail']);
+Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword']);
+
+Route::middleware('auth:sanctum')->get('/compte-connecte', [AuthController::class, 'compteConnecte']);
+Route::middleware('auth:sanctum')->post('/update-password', [AuthController::class, 'updatePassword']);
+
 
 
 Route::post('/login', [AuthController::class, 'login']);

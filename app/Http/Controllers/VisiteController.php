@@ -29,7 +29,7 @@ class VisiteController extends Controller
         $visiteData = $request->only(['dateHeureDebut', 'dateHeureFin', 'raison_visite_id', 'personnel_id', 'type_visite_id', 'statut_id', 'details']);
         $visiteValidator = Validator::make($visiteData, [
             // Règles de validation pour la visite
-            'dateHeureDebut' => 'required|date',
+            'dateHeureDebut' => 'required|date|after_or_equal:today',
             'dateHeureFin' => 'required|date|after_or_equal:dateHeureDebut',
             'raison_visite_id' => 'required|exists:raison_visites,id',
             'personnel_id' => 'required|exists:personnels,id',
@@ -39,6 +39,8 @@ class VisiteController extends Controller
         ], [
             'dateHeureDebut.required' => 'La date de début est obligatoire',
             'dateHeureDebut.date' => 'La date de début doit être une date valide',
+            'dateHeureDebut.after_or_equal' => 'La date de début ne peut pas être antérieure à aujourd\'hui',
+
 
             'dateHeureFin.required' => 'La date de fin est obligatoire',
             'dateHeureFin.date' => 'La date de fin doit être une date valide',
@@ -59,9 +61,6 @@ class VisiteController extends Controller
             'details.string' => 'Les détails doivent être une chaîne de caractères',
         ]);
 
-        if ($visiteValidator->fails()) {
-            return response()->json(['errors' => $visiteValidator->errors()], 422);
-        }
 
         // Assumer que $request->visiteurs est un tableau de données visiteur
         $visiteurData = $request->visiteur;
@@ -88,8 +87,19 @@ class VisiteController extends Controller
             'type_visiteur_id.exists' => 'Le type de visiteur existe pas'
         ]);
 
+        $errors = [];
+
+        // Vérification si les validateurs ont échoué
         if ($visiteurValidator->fails()) {
-            return response()->json(['errors' => $visiteurValidator->errors()], 422);
+            $errors = array_merge($errors, $visiteurValidator->errors()->toArray());
+        }
+        if ($visiteValidator->fails()) {
+            $errors = array_merge($errors, $visiteValidator->errors()->toArray());
+        }
+
+        // S'il y a des erreurs, retourner la réponse avec toutes les erreurs
+        if (!empty($errors)) {
+            return response()->json(['errors' => $errors], 422);
         }
 
         DB::beginTransaction();
@@ -110,6 +120,7 @@ class VisiteController extends Controller
             return response()->json(['message' => 'La visite et le visiteur ont été enregistrés avec succès', 'visite' => $visite], 201);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Erreur lors de l\'enregistrement de la visite et du visiteur', ['exception' => $e->getMessage()]);
             return response()->json(['message' => 'Une erreur est survenue lors de l\'enregistrement.'], 500);
         }
     }

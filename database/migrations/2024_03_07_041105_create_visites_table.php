@@ -51,7 +51,7 @@ return new class extends Migration
                 ->onDelete("cascade")
                 ->onUpdate("cascade");
 
-            $table->text('details')->default('RAS');
+            $table->text('details')->nullable(); // Exemple avec un champ string
             $table->timestamps();
         });
     }

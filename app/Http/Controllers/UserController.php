@@ -6,6 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Password;
+
+
 
 class UserController extends Controller
 {
@@ -118,5 +121,26 @@ class UserController extends Controller
             "message" => 'Compte supprimée avec succes',
             "compte" => $compte
         ], 200);
+    }
+
+    public function verifierEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $compte = User::where('email', $request->email)->first();
+
+        if (!$compte) {
+            return response()->json(['error' => 'L\'adresse email n\'a pas été trouvée.'], 404);
+        }
+
+        $status = Password::sendResetLink($request->only('email'));
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json(['message' => 'Un lien de réinitialisation a été envoyé à votre adresse email.'], 200);
+        } else {
+            return response()->json(['error' => 'Impossible d\'envoyer le lien de réinitialisation.'], 500);
+        }
     }
 }
